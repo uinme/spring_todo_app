@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Todo app</title>
+
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+  <header>
+    <p>ヘッダー</p>
+  </header>
+
+  <div th:include="__${contents}__" class="container"></div>
+
+  <footer>
+  
+  </footer>
+
+  <script th:src="@{/js/bootstrap.bundle.js}"></script>
+</body>
+</html>

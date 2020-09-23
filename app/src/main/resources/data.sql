@@ -1,0 +1,1 @@
+INSERT INTO todo VALUES (NULL, 'todo1');

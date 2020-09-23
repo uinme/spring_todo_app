@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div th:fragment="todo_new_contents">
+    <h1>Create TODO</h1>
+
+    <form th:action="@{/todo/create}" method="post" th:object="${todoModel}">
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea name="content" class="form-control" th:field="*{content}" th:classappend="${#fields.hasErrors('content')} ? 'is-invalid'"></textarea>
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Create TODO</button>
+    </form>
+  </div>
+</body>
+</html>
