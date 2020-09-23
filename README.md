@@ -1,4 +1,4 @@
-# Spring Boot 基礎 チュートリアル
+# Spring Boot 基本事項
 
 ## 前提としている環境
 
@@ -93,6 +93,77 @@ public class todoModel {
 }
 ```
 
+## ビューとコントローラ間のデータのやりとり
+
+### 属性による受け渡し
+
+`/sample`で`Get`リクエストを受け、コントローラで定義した変数を`sample.html`で
+表示する例は以下のようになる。
+
+```java
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+
+@Controller
+public class SampleController {
+
+  @GetMapping("/sample")
+  public String getSample(Model model) {
+
+    String text = "hello";
+
+    // model.addAttribute("属性名", 何らのオブジェクト)
+    model.addAttribute("text", hello);
+
+    return "sample";
+
+  }
+
+}
+```
+
+ビューでは、次のようにして値を取り出す。
+
+```html
+<!-- textはコントローラで指定した属性名 -->
+<p th:value="${text}"></p>
+```
+
+### データバインド
+
+モデルをインスタンス化する際、入力フォームの値をモデルのフィールドに適用したい場合がある。
+例として、ユーザーの新規作成があげられる。まず、次のようなユーザーモデルを想定する。
+
+```java
+import lombok.Data;
+
+@Data
+public class UserModel {
+  
+  private int id;
+  private String email;
+  private String username;
+  private String password;
+
+}
+```
+
+次にコントローラーは以下のように定義する。
+
+```java
+@Controller
+public class UserController {
+
+  @PostMapping("/user/create")
+  public String postCreateUser(@ModelAttribute UserModel user, Model model) {
+
+    
+
+  }
+
+}
+```
+
 ### バリデーションの設定
 
 バリデーションはモデルクラスに記述し、
@@ -118,13 +189,64 @@ public class todoModel {
 指定する。`{ }`で囲うと独自キーとして認識され、別ファイルに記述したエラーメッセージ一覧
 と対応付けることができる。エラーメッセージは後述を参照のこと。
 
-## ビューとコントローラ間のデータのやりとり
+上記だけでは、例外発生のエラー画面がブラウザ上に表示され、適切なメッセージがユーザーに提供されないため、
+以下のようにコントローラーにメソッドを作成する。
 
-### 属性による受け渡し
+```java
+@Controller
+public class TodoController {
 
+  // 入力ページのformタグからPostリクエストがくる想定
+  @PostMapping("/todo/create")
+  public String postCreateTodo(
+    @ModelAttribute @Validated TodoModel todo,
+    BindingResult bindingResult,
+    Model model) {
 
-### データバインド
+    // ↑ バリデーションするモデルに@Validatedをつけた引数とバインディング結果を受け取るBindingResult引数を
+    // 指定する
 
+    // 検証に失敗した場合、入力ページに戻す
+    if (bindingResult.hasErrors) {
+      return getNewTodo(todo, model);
+    }
+
+    // 成功した場合、index.htmlを表示する
+    return "index";
+
+  }
+
+  // 入力ページを表示するためのメソッド
+  @GetMapping("/todo/new")
+  public String getNewTodo(@ModelAttribute TodoModel todo, Model model) {
+
+    return "todo/new";
+
+  }
+
+}
+```
+
+上記の`postCreateTodo`メソッドは検証に失敗した際、入力ページを再び表示する。
+このとき、入力フォーム周辺にエラー内容を表示することがよく行われる。
+その表示は以下のようにする。
+
+```html
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<!-- 中略 -->
+
+<form th:action="@{/post/create}" method="post" th:object="${postModel}">
+  <label>Content</label>
+  <input type="text" th:field="*{content}">
+  <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}">
+</form>
+
+<!-- 省略 -->
+```
+
+上記の`content`の部分は対象となるフィールド名を記述する。
 
 ## Spring JSBCによるデーターベース操作
 
@@ -133,8 +255,8 @@ CRUDのサンプル
 
 ## エラーメッセージの管理
 
-エラーメッセージは`resources`ディレクトリに`messages.properties`を作成して管理する。
-例えば、バリデーションの設定におけるメッセージを記述する場合、以下のようになる。
+バリデーションに関するエラーメッセージは`resources`ディレクトリに`ValidationMessages.properties`を作成して管理する。
+例えば、バリデーションの設定で指定した独自キーに対するメッセージを記述する場合、以下のようになる。
 
 ```
 content=コンテンツ
@@ -143,57 +265,12 @@ notblack_todo_content={0}を入力してください
 length_todo_content={0}は文字数{2}以下で入力してください
 ```
 
-`{0}`は検証アノテーションで定義されているフィールドを示す。
+`{*}`の`*`は検証アノテーションで設定したオプションの順番を表す。
+例えば、`@Length(min = 10, max = 50)`とした場合、`{1}`および`{2}`は、それぞれ、`10`および`50`を示す。
 `{0}`はアノテーションを付与したフィールド名が格納されており、
 このまま用いると「contentを入力してください」のように表示される。
 contentを日本語や別名にしたい場合、`content=コンテンツ`のように指定する。
 
-上記の独自キーを用いた方法でメッセージ管理を行う場合、デフォルトの状態では、
-`ValidationMessages.properties`に記述する必要がある。
-このファイルをそのまま作成すればよいが、日本語が文字化けするため、
-文字コードの設定を変更する必要がある。その設定はソースファイル配置配下に
-`WebConfig.java`を作成して以下のようにする。
-
-```java
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-@Configuration
-public class WebConfig {
-  
-  @Bean
-  public MessageSource messageSource() {
-    
-    ReloadableResourceBundleMessageSource bean =
-      new ReloadableResourceBundleMessageSource();
-    
-    // メッセージプロパティのファイル名を指定する
-    bean.setBasename("classpath:messages");
-
-    // 日本語を扱えるようにするために、文字コードをUTF-8にする
-    bean.setDefaultEncoding("UTF-8");
-
-    return bean;
-
-  }
-
-  @Bean
-  public LocalValidatorFactoryBean localValidatorFactoryBean() {
-
-    LocalValidatorFactoryBean localValidatorFactoryBean =
-      new LocalValidatorFactoryBean();
-
-    localValidatorFactoryBean.setValidationMessageSource(messageSource());
-
-    return localValidatorFactoryBean;
-
-  }
-
-}
-```
 
 ## ロギング
 
