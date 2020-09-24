@@ -8,7 +8,8 @@
     <div class="card mb-4" th:each="todo : ${todos}" th:object="${todo}">
       <div class="card-body">
         <h5 class="card-title" th:text="*{id}"></h5>
-        <h6 class="card-subtitle mb-2 text-muted">yyyy/MM/dd hh:mm</h6>
+        <h6 class="card-subtitle mb-2 text-muted" th:text="'Created at: ' + ${#dates.format(todo.createdAt, 'yyyy/MM/dd HH:mm')}"></h6>
+        <h6 class="card-subtitle mb-2 text-muted" th:text="'Updated at: ' + ${#dates.format(todo.updatedAt, 'yyyy/MM/dd HH:mm')}"></h6>
         <p class="card-text" th:text="*{content}"></p>
         <a href="" class="card-link">
           <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

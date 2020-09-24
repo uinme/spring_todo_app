@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS todo (
   id         INT  PRIMARY KEY AUTO_INCREMENT,
-  content    VARCHAR(500)
+  content    VARCHAR(500),
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user (
