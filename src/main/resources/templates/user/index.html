@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div th:fragment="user_index_contents">
+    <ul th:object="${userModel}">
+      <li th:text="*{id}"></li>
+      <li th:text="*{email}"></li>
+      <li th:text="*{username}"></li>
+      <li th:text="*{password}"></li>
+    </ul>
+  </div>
+</body>
+</html>

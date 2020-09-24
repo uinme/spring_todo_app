@@ -1,0 +1,25 @@
+#sidebar {
+  min-height: 100vh;
+  margin-left: -15rem;
+}
+
+.sidebar-heading {
+  padding: 1rem 1rem;
+  font-size: 1.2rem;
+}
+
+#sidebar .list-group {
+  width: 15rem;
+}
+
+#wrapper {
+  overflow-x: hidden;
+}
+
+#wrapper.toggled #sidebar {
+  margin-left: 0;
+}
+
+.page-contents {
+  min-width: 100vw - 15rem;
+}

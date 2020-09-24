@@ -154,15 +154,70 @@ public class UserModel {
 @Controller
 public class UserController {
 
+  // Postリクエストでフォームの内容を受ける処理
   @PostMapping("/user/create")
   public String postCreateUser(@ModelAttribute UserModel user, Model model) {
 
-    
+    // 引数userにビューのフォームと関連付けられたデータがセットされている
+    // あとは、データベースに登録するなどの処理を行う
+
+  }
+
+  // Getリクエストでコントローラーで設定したデータをフォームに適用する処理
+  @GetMapping("/user/new")
+  public String getNewUser(@ModelAttribute UserModel user, Model model) {
+
+    // 何らかの形でコントローラーでuserに値を設定する
+    user.setId(1);
+    user.setEmail("spring@spring.com");
+    user.setUsername("Spring");
+    user.setPassword("password");
+
+    // 入力フォームのあるページを表示する
+    // このとき、入力フォームに上で設定した値が自動的にセットされる
+    return "user/new.html";
 
   }
 
 }
 ```
+
+最後に、ビュー`user/new.html`は以下の様にする。
+
+```html
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www/thymeleaf.org">
+
+<!-- 中略 -->
+
+<form th:action="@{/user/create}" method="post" th:object="${userModel}">
+  <div>
+    <label>Email</label>
+    <input type="text" th:field="*{email}">
+  </div>
+  <div>
+    <label>Username</label>
+    <input type="text" th:field="*{username}">
+  </div>
+  <div>
+    <label>password</label>
+    <input type="text" th:field="*{password}">
+  </div>
+</form>
+
+<!-- 省略 -->
+```
+
+ビューでのデータバインドの設定は各inputフィールドに`th:field`属性を追加すること。
+属性の値はバインドしたいモデルのフィールド名を指定するが、指定方法にいくつか方法がある。
+上記では、省略形を用いている。
+
+省略形はformタグに`th:object="${モデル名}"`を追加し、各inputフィールドに`th:field="*{モデルのフィールド名}"`
+を追加する。モデル名はコントローラーで指定したモデル名とする（本例ではUserModel）。ここで、モデル名の先頭を小文字に
+することに注意すること。UserModelであればuserModelとする。モデルのフィールド名はそのままフィールド名を記述する。
+
+省略しない方法は、`th-object`を記述せず、各inputフィールドに直接、`th:field="${userModel.email}"`のように
+記述していく。
 
 ### バリデーションの設定
 
@@ -248,10 +303,74 @@ public class TodoController {
 
 上記の`content`の部分は対象となるフィールド名を記述する。
 
-## Spring JSBCによるデーターベース操作
+## Spring JDBCによるデーターベース操作
 
-CRUDのサンプル
+Spring JDBCでは`@Repository`と`@Service`を付与したクラスを用いてデータベース操作を行う。
+コントローラークラスはサービスクラスのメソッドを利用してデータベース操作を行い、
+サービスクラスはリポジトリ―クラスのメソッドを利用して操作を行う。
 
+例えば、ユーザー登録のデーターベース操作は以下のようになる。
+
+```java
+@Repository
+public class UserDao {
+
+  @Autowired
+  private NamedParameterJdbcTemplate jdbc;
+
+  public int insert(UserModel user) {
+
+    String sql = "INSERT INTO user VALUES (:id, :email, :username, :password)";
+
+    SqlParemeterSource paramSource = new MapSqlParameterSource()
+      .addValue("id", user.getIt());
+      .addValue("email", user.getEmail());
+      .addValue("username", user.getUsername());
+      .addValue("password", user.getPassword());
+
+    RowMapper<UserModel> rowMapper = new BeanPropertyRowMapper<UserModel>();
+
+    return jdbc.update(sql, paramSource, rowMapper);
+
+  }
+
+}
+```
+
+```java
+@Service
+public class UserService {
+
+  @Autowired
+  UserDao dao;
+
+  public boolean insert(UserModel user) {
+
+    return dao.insert(user);
+
+  }
+
+}
+```
+
+```java
+@Controller
+public class UserController {
+
+  @Autowired
+  private UserService userService;
+
+  @PostMapping("/user/create")
+  public String postCreateUser(@ModelAttribute UserModel user, Model model) {
+
+    userService.insert(user);
+
+    return "/user/index";
+
+  }
+
+}
+```
 
 ## エラーメッセージの管理
 
