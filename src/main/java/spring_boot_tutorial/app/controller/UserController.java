@@ -24,4 +24,12 @@ public class UserController {
 
   }
 
+  @GetMapping("/login")
+  public String getLogin(Model model) {
+
+    model.addAttribute("contents",  "login/login::login_contents");
+    return "application";
+
+  }
+
 }
