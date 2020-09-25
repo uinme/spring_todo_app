@@ -15,21 +15,21 @@
       <a th:href="@{/home}" class="navbar-brand">TodoApp</a>
 
       <ul class="navbar-nav mr-auto">
-        <li class="navbar-item">
+        <li class="navbar-item"sec:authorize="isAuthenticated()">
           <a th:href="@{/todo/index}" class="nav-link">Your Todo</a>
         </li>
       </ul>
 
       <ul class="navbar-nav">
-        <li class="navbar-item">
+        <li class="navbar-item" sec:authorize="!isAuthenticated()">
           <a href="#" class="nav-link">Sign up</a>
         </li>
-        <li class="navbar-item">
-          <a th:href="@{/login}" class="nav-link" sec:authorize="!isAuthenticated()">Log in</a>
+        <li class="navbar-item" sec:authorize="!isAuthenticated()">
+          <a th:href="@{/login}" class="nav-link">Log in</a>
         </li>
-        <li class="navbar-item">
+        <li class="navbar-item" sec:authorize="isAuthenticated()">
           <form th:action="@{/logout}" id="logoutForm" method="POST">
-            <a href="javascript:logoutForm.submit()" class="nav-link" sec:authorize="isAuthenticated()">Log out</a>
+            <a href="javascript:logoutForm.submit()" class="nav-link">Log out</a>
           </form>
         </li>
       </ul>
@@ -45,7 +45,7 @@
   </div>
 
   <footer>
-    
+
   </footer>
 
   <script th:src="@{/js/bootstrap.bundle.js}"></script>
