@@ -390,9 +390,154 @@ length_todo_content={0}は文字数{2}以下で入力してください
 このまま用いると「contentを入力してください」のように表示される。
 contentを日本語や別名にしたい場合、`content=コンテンツ`のように指定する。
 
-
-## ロギング
-
-
 ## Spring Securityを利用したログイン機能
 
+### 導入
+
+Sprign Sercurityとそれに対応したThymeleaf extraをインストールする。
+Marvenの場合、以下を`dependencies`タグ内に追加する。
+
+```xml
+<dependency>
+  <groupId>org.thymeleaf.extras</groupId>
+  <artifactId>thymeleaf-extras-springsecurity5</artifactId>
+</dependency>
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+
+導入が完了すると`/login`にアクセスした際にデフォルトのログインページが表示
+される。
+
+### 設定
+
+ログインページ設定やアクセス制限などの設定は`SecurityConfig.java`に記述する。
+同ソースファイルはJavaソースファイルディレクトリの直下に作成する。
+以下に設定例を示す。
+
+```java
+@EnableWebSecurity
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Autowired
+  private DataSource dataSource;
+
+  // 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　↓ trueを入れないと動作しない
+  private static final String USER_SQL = "SELECT email, password, true FROM user WHERE email = ?";
+  // ROLE使用しなくても指定しないと動作しない
+  private static final String ROLE_SQL = "SELECT email, role FROM user WHERE email = ?";
+
+  @Override
+  public void configuer(WebSecurity web) throws Exception {
+
+    // 静的ファイルをセキュリティの対象外にする
+    web.ignoring().antMatchers("/css/**", "/js/**");
+
+  }
+
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
+
+    // URLへのアクセスの許可設定
+    http
+    .authorizeRequests()
+      .antMatchers("/css/**").permitAll()
+      .antMatchers("/js/**").permitAll()
+      .antMatchers("/login").permitAll()
+      .antMatchers("/signup").permitAll()
+      
+      .anyRequest().authenticated();  // 上記以外は直リンク禁止
+
+    // ログイン処理に関する設定
+    http
+      .formLogin()
+        .loginProcessingUrl("/login")            // ログイン処理を行う対象のURL
+        .loginPage("/login")                     // ログインページのパス
+        .failureUrl("/login")                    // ログイン失敗時のフォワード先
+        .usernameParameter("email")              // 対象となるinputのname属性の値
+        .passwordParameter("password")           // 対象となるinputのname属性の値
+        .defaultSuccessUrl("/todo/index", true); // ログイン成功時のフォワード先
+
+  }
+
+  @Override
+  public void congifure(AuthenticationManagerBuilder auth) throws Exception {
+
+    // 認証に関する設定
+    auth.jdbcAuthentication()
+      .dataSource(dataSource)
+      .usersByUsernameQuery(USER_SQL)
+      .authoritiesByUsernameQuery(ROLE_SQL)
+      .passwordEncoder(passwordEncoder());   // パスワードエンコーダの指定
+
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+}
+```
+
+パスワードは暗号化して取り扱うため、`Repository`クラスでのパスワードの取り扱い
+も変更する必要がある。例えば、ユーザーをインサートする場合、フォームから受け取った
+パスワードを暗号化してSQLパラメータに適用する。暗号化は以下の様に、`PasswordEncoder`の
+`encode`メソッドを使用すればよい。
+
+```java
+@Repository
+public class UserDao {
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  public void insert(UserModel user) {
+
+    String sql = "INSERT INTO user "
+               + "email, "
+               + "password, "
+               + "usernmae "
+               + "VALUES (:email, :password, :username)";
+
+    // 受け取ったユーザーモデルのパスワードを暗号化
+    String password = passwordEncoder.encode(model.getPassword());
+
+    SqlParameterSource paramSource = new MapSqlParameterSource()
+      .addValue("email", user.getEmail())
+      .addValue("password", password) // 暗号化したパスワードを適用
+      .addValue("username", user.getUsername());
+
+    RowMapper<UserModel> rowMapper = new BeanPropertyRowMapper<UserModel>(UserModel.class);
+
+    return jdbc.update(sql, rowMapper);
+
+  }
+
+}
+```
+
+### Thymeleaf extra
+
+ログインフォームでのエラー表示
+
+```html
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- エラーメッセージ -->
+<span
+  th:if="${session['SPRING_SECURITY_LAST_EXCEPTION'] != null}"
+  th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"
+></span>
+```
+
+ログイン中かどうかの確認
+
+```html
+<!-- ログイン中にのみ表示される -->
+<div sec:authorize="isAuthenticated()">ログイン中</div>
+```
