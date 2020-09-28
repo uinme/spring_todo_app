@@ -45,3 +45,9 @@
 .login {
   background-color: #eee;
 }
+
+.form-signup {
+  width: 15rem;
+  margin-left: auto;
+  margin-right: auto;
+}
