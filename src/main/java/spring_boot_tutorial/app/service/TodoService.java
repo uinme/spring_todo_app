@@ -6,29 +6,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import spring_boot_tutorial.app.model.TodoModel;
-import spring_boot_tutorial.app.repository.TodoDao;
+import spring_boot_tutorial.app.mybatis.TodoMapper;
 
 @Service
 public class TodoService {
 
   @Autowired
-  private TodoDao dao;
+  private TodoMapper todoMapper;
 
   public TodoModel selectOne(int id) {
 
-    return dao.selectOne(id);
+    return todoMapper.selectOne(id);
 
   }
 
   public List<TodoModel> selectMany() {
 
-    return dao.selectMany();
+    return todoMapper.selectMany();
 
   }
 
   public boolean insert(TodoModel todo) {
 
-    int rowNumber = dao.insert(todo);
+    int rowNumber = todoMapper.insertOne(todo);
 
     if (rowNumber > 0) {
       return true;
@@ -38,28 +38,28 @@ public class TodoService {
 
   }
 
-  public boolean update(TodoModel todo) {
+  // public boolean update(TodoModel todo) {
 
-    int rowNumber = dao.update(todo);
+  //   int rowNumber = todoMapper.update(todo);
 
-    if (rowNumber > 0) {
-      return true;
-    }
+  //   if (rowNumber > 0) {
+  //     return true;
+  //   }
 
-    return false;
+  //   return false;
 
-  }
+  // }
 
-  public boolean delete(TodoModel todo) {
+  // public boolean delete(TodoModel todo) {
 
-    int rowNumber = dao.delete(todo);
+  //   int rowNumber = todoMapper.delete(todo);
 
-    if (rowNumber > 0) {
-      return true;
-    }
+  //   if (rowNumber > 0) {
+  //     return true;
+  //   }
 
-    return false;
+  //   return false;
 
-  }
+  // }
 
 }

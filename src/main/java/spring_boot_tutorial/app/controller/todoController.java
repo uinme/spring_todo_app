@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import spring_boot_tutorial.app.model.TodoFormModel;
+import spring_boot_tutorial.app.model.TodoListModel;
 import spring_boot_tutorial.app.model.TodoModel;
 import spring_boot_tutorial.app.service.TodoService;
 
 @Controller
-public class todoController {
+public class TodoController {
 
   @Autowired
   private TodoService todoService;
@@ -35,7 +37,20 @@ public class todoController {
   }
   
   @GetMapping("/todo/new")
-  public String getNew(@ModelAttribute TodoModel todo, Model model) {
+  public String getNew(@ModelAttribute TodoFormModel todoForm, Model model) {
+
+    /* ストアドプロシージャ
+    *  INSERT_TODO(user_id, todoList配列)
+    *  ・内部でtodoのidを自動採番
+    */
+
+    for (int i = 0; i < 2; i++) {
+      TodoListModel newTodoList = new TodoListModel();
+      newTodoList.setTodoId(1);
+      newTodoList.setContent("");
+
+      todoForm.getTodoLists().add(newTodoList);
+    }
 
     model.addAttribute("useSidebar", true);
 
@@ -45,13 +60,17 @@ public class todoController {
   }
 
   @PostMapping("/todo/create")
-  public String postCreate(@ModelAttribute @Validated TodoModel todo, BindingResult bindingResult,  Model model) {
+  public String postCreate(@ModelAttribute @Validated TodoFormModel todoForm, BindingResult bindingResult,  Model model) {
 
     if (bindingResult.hasErrors()) {
-      return getNew(todo, model);
+      return getNew(todoForm, model);
     }
 
-    todoService.insert(todo);
+    //todoService.insert(todo);
+
+    TodoFormModel test = todoForm;
+
+    System.out.println(test);
 
     model.addAttribute("useSidebar", true);
 

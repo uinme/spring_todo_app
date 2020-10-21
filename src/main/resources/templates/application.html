@@ -48,7 +48,21 @@
 
   </footer>
 
-  <script th:src="@{/js/bootstrap.bundle.js}"></script>
   <script th:src="@{/js/jquery-3.5.1.min.js}"></script>
+  <script th:src="@{/js/bootstrap.bundle.js}"></script>
+  <script>
+    $("#add-todo-button").click(function() {
+      var baseInput = $("input[id^='todoList']").last();
+      var baseId = baseInput.attr("id");
+      var baseName = baseInput.attr("name");
+      var index = parseInt(baseId.replace(/[^0-9]/g, ""));
+      var newIndex = index + 1;
+      var newId = baseId.replace(/[0-9]+/, newIndex);
+      var newName = baseName.replace(/[0-9]+/, newIndex);
+
+      baseInput.parent().clone().children().attr("id", newId)
+        .attr("name", newName).val("").parent().appendTo("#todo-lists");
+    });
+  </script>
 </body>
 </html>

@@ -7,15 +7,27 @@
   <div th:fragment="todo_new_contents">
     <h1>Create TODO</h1>
 
-    <form th:action="@{/todo/create}" method="post" th:object="${todoModel}">
+    <form th:action="@{/todo/create}" method="post" th:object="${todoFormModel}">
       <div class="form-group">
-        <label for="content">Content</label>
-        <textarea name="content" class="form-control" th:field="*{content}" th:classappend="${#fields.hasErrors('content')} ? 'is-invalid'"></textarea>
-        <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+        <label for="title">Title</label>
+        <input type="text" name="title" class="form-control" th:field="*{title}" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'">
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+      </div>
+
+      <p>Todos:</p>
+      <div id="todo-lists" class="form-group">
+        <div class="form-group" th:each="todoList, stat : *{todoLists}">
+          <input type="text" class="form-control" th:field="*{todoLists[__${stat.index}__].content}">
+        </div>
+      </div>
+      <div class="form-group">
+        <button type="button" id="add-todo-button" class="btn btn-outline-info btn-block">Add new todo</button>
       </div>
       
       <button type="submit" class="btn btn-primary">Create TODO</button>
     </form>
   </div>
+
+
 </body>
 </html>

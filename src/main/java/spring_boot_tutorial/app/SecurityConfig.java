@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @Configuration
@@ -21,8 +20,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private DataSource dataSource;
 
-  private static final String USER_SQL = "SELECT email, password, true FROM user WHERE email = ?";
-  private static final String ROLE_SQL = "SELECT email, role FROM user WHERE email = ?";
+  private static final String USER_SQL = "SELECT email, password, enabled FROM todo_user WHERE email = ?";
+  private static final String ROLE_SQL = "SELECT email, role FROM todo_user WHERE email = ?";
   
   // Webリソースに関するセキュリティ設定
   @Override

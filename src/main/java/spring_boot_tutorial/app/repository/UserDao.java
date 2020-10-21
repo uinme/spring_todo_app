@@ -48,14 +48,16 @@ public class UserDao {
   public int insertOne(UserModel user) {
 
     String sql = "INSERT INTO user "
+               + "id, "
                + "email, "
                + "username, "
                + "password, "
-               + "VALUES (:email, :username, :password)";
+               + "VALUES :id, :email, :username, :password)";
 
     String password = passwordEncoder.encode(user.getPassword());
 
     SqlParameterSource paramSource = new MapSqlParameterSource()
+      .addValue("id", "todouser_id_seq.nextval")
       .addValue("email", user.getEmail())
       .addValue("username", user.getUsername())
       .addValue("password", password);
