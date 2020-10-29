@@ -9,7 +9,7 @@ public class UserModel {
   private String email;
   private String username;
   private String password;
-  private int    enabled;
+  private boolean enabled;
   private String role;
 
 }
