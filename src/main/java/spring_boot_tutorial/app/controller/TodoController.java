@@ -3,6 +3,7 @@ package spring_boot_tutorial.app.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import spring_boot_tutorial.app.model.ActionModel;
 import spring_boot_tutorial.app.model.TodoListModel;
+import spring_boot_tutorial.app.model.UserDetail;
 import spring_boot_tutorial.app.service.TodoService;
 
 @Controller
@@ -57,13 +59,13 @@ public class TodoController {
   }
 
   @PostMapping("/todo/create")
-  public String postCreate(@ModelAttribute @Validated TodoListModel todoList, BindingResult bindingResult,  Model model) {
+  public String postCreate(@ModelAttribute @Validated TodoListModel todoList, BindingResult bindingResult, Model model, @AuthenticationPrincipal UserDetail userDetail) {
 
     if (bindingResult.hasErrors()) {
       return getNew(todoList, model);
     }
 
-    todoList.setUserId(3);
+    todoList.setUserId(userDetail.getUserId());
 
     todoService.insertTodoList(todoList);
 
