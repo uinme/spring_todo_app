@@ -84,6 +84,12 @@ public class staticPageController {
 ```java
 import lombok.Data;
 
+// @DataはLombokのアノテーションで、Java Beanの仕様に従って、
+// GetterおよびSetterメソッドを自動的に定義してくれる。
+// (これらのメソッドはSprind JDBCやMybatisなどのマッパーで呼び出されるため、
+// 実装しておく必要がある)
+// この機能を利用する場合、pom.xmlのDependenciesにLombokを追加し、
+// IDEにLombokプラグインをインストールする必要がある。
 @Data
 public class todoModel {
   
@@ -216,7 +222,7 @@ public class UserController {
 を追加する。モデル名はコントローラーで指定したモデル名とする（本例ではUserModel）。ここで、モデル名の先頭を小文字に
 することに注意すること。UserModelであればuserModelとする。モデルのフィールド名はそのままフィールド名を記述する。
 
-省略しない方法は、`th-object`を記述せず、各inputフィールドに直接、`th:field="${userModel.email}"`のように
+省略しない方法は、`th:object`を記述せず、各inputフィールドに直接、`th:field="${userModel.email}"`のように
 記述していく。
 
 ### バリデーションの設定
@@ -426,9 +432,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private DataSource dataSource;
 
-  // 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　↓ trueを入れないと動作しない
-  private static final String USER_SQL = "SELECT email, password, true FROM user WHERE email = ?";
-  // ROLE使用しなくても指定しないと動作しない
+  // Userテーブルは最小構成で次のように作成する必要がある
+  // CREATE TABLE user (
+  //   email VARCHAR(100),
+  //   password VARCHAR(60), -- * Spring Securityのbcrypt方式で生成される暗号文字列は60文字
+  //   enabled INTEGER,  -- * 数値型のenabledカラムが必須
+  //   role VARCHAR(20)  -- * roleカラムも必須
+  // );
+  private static final String USER_SQL = "SELECT email, password, enabled FROM user WHERE email = ?";
   private static final String ROLE_SQL = "SELECT email, role FROM user WHERE email = ?";
 
   @Override
