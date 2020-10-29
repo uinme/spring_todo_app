@@ -48,32 +48,4 @@ public class UserService {
 
   }
 
-  // public boolean updateOne(UserModel user) {
-
-  //   int rowNumber = dao.updateOne(user);
-
-  //   if (rowNumber > 0) {
-
-  //     return true;
-
-  //   }
-
-  //   return false;
-
-  // }
-
-  // public boolean deleteOne(UserModel user) {
-
-  //   int rowNumber = dao.deleteOne(user);
-
-  //   if (rowNumber > 0) {
-
-  //     return true;
-
-  //   }
-
-  //   return false;
-
-  // }
-
 }

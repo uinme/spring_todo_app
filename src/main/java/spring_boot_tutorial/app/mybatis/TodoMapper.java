@@ -2,22 +2,18 @@ package spring_boot_tutorial.app.mybatis;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Param;
 
-import spring_boot_tutorial.app.model.TodoModel;
+import spring_boot_tutorial.app.model.TodoListModel;
 
 @Mapper
 public interface TodoMapper {
-  
-  @Select("SELECT * FROM todo_todo WHERE id = #{id}")
-  TodoModel selectOne(int id);
 
-  @Select("SELECT * FROM todo_todo")
-  List<TodoModel> selectMany();
+  TodoListModel selectOne(int id);
 
-  @Insert("INSERT INTO todo_todo id, title VALUES (TODOTODO_ID_SEQ.NEXTVAL, #{title})")
-  int insertOne(TodoModel todo);
+  List<TodoListModel> selectMany();
+
+  void insertTodoList(@Param("todoList") TodoListModel todoList);
 
 }

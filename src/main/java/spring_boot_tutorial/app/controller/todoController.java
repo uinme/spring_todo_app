@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import spring_boot_tutorial.app.model.TodoFormModel;
+import spring_boot_tutorial.app.model.ActionModel;
 import spring_boot_tutorial.app.model.TodoListModel;
-import spring_boot_tutorial.app.model.TodoModel;
 import spring_boot_tutorial.app.service.TodoService;
 
 @Controller
@@ -25,9 +24,9 @@ public class TodoController {
   @GetMapping("/todo/index")
   public String getIndex(Model model) {
 
-    List<TodoModel> todos = todoService.selectMany();
+    List<TodoListModel> todoLists = todoService.selectMany();
 
-    model.addAttribute("todos", todos);
+    model.addAttribute("todoLists", todoLists);
 
     model.addAttribute("useSidebar", true);
 
@@ -37,7 +36,7 @@ public class TodoController {
   }
   
   @GetMapping("/todo/new")
-  public String getNew(@ModelAttribute TodoFormModel todoForm, Model model) {
+  public String getNew(@ModelAttribute TodoListModel todoList, Model model) {
 
     /* ストアドプロシージャ
     *  INSERT_TODO(user_id, todoList配列)
@@ -45,11 +44,9 @@ public class TodoController {
     */
 
     for (int i = 0; i < 2; i++) {
-      TodoListModel newTodoList = new TodoListModel();
-      newTodoList.setTodoId(1);
-      newTodoList.setContent("");
-
-      todoForm.getTodoLists().add(newTodoList);
+      ActionModel newAction = new ActionModel();
+      newAction.setContent("");
+      todoList.getActions().add(newAction);
     }
 
     model.addAttribute("useSidebar", true);
@@ -60,17 +57,15 @@ public class TodoController {
   }
 
   @PostMapping("/todo/create")
-  public String postCreate(@ModelAttribute @Validated TodoFormModel todoForm, BindingResult bindingResult,  Model model) {
+  public String postCreate(@ModelAttribute @Validated TodoListModel todoList, BindingResult bindingResult,  Model model) {
 
     if (bindingResult.hasErrors()) {
-      return getNew(todoForm, model);
+      return getNew(todoList, model);
     }
 
-    //todoService.insert(todo);
+    todoList.setUserId(3);
 
-    TodoFormModel test = todoForm;
-
-    System.out.println(test);
+    todoService.insertTodoList(todoList);
 
     model.addAttribute("useSidebar", true);
 

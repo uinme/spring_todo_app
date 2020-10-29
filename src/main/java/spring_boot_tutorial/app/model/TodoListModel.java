@@ -1,19 +1,24 @@
 package spring_boot_tutorial.app.model;
 
-import javax.validation.constraints.NotBlank;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 
 @Data
 public class TodoListModel {
-
-  private int id;
   private int todoId;
-  
-  @NotBlank(message = "{notblack_todo_content}")
-  @Length(max = 500, message = "{length_todo_content}")
-  private String content;
+  private int userId;
+  @NotBlank(message = "{notblank_todo_title}")
+  private String title;
+  private Timestamp createdAt;
+  private Timestamp updatedAt;
+  private List<ActionModel> actions;
 
+  TodoListModel () {
+    actions = new ArrayList<>();
+  }
 }

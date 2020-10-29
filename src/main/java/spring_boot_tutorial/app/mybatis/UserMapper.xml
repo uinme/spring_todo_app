@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="spring_boot_tutorial.app.mybatis.UserMapper">
+  <select id="selectOne" resultType="UserModel">
+    SELECT * FROM todo_user WHERE id = #{id}
+  </select>
+
+  <select id="selectMany" resultType="UserModel">
+    SELECT * FROM todo_user;
+  </select>
+
+  <insert id="insertOne" parameterType="UserModel">
+    INSERT INTO todo_user (id, username, email, password)
+    VALUES (TODO_USER_SEQ.NEXTVAL, #{username}, #{email}, #{password})
+  </insert>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="spring_boot_tutorial.app.mybatis.TodoMapper">
+  <select id="selectOne" resultMap="todoListResultMap">
+    SELECT t.id todo_Id, t.user_id, t.title, t.created_at, t.updated_at, a.id action_id, a.content
+    FROM action a
+    JOIN todo t ON a.todo_id = t.id
+    WHERE t.id = #{id}
+  </select>
+
+  <select id="selectMany" resultMap="todoListResultMap">
+    SELECT t.id todo_Id, t.user_id, t.title, t.created_at, t.updated_at, a.id action_id, a.content
+    FROM action a
+    JOIN todo t ON a.todo_id = t.id
+  </select>
+
+  <select id="insertTodoList" statementType="CALLABLE">
+    {CALL INSERT_TODO_LIST(#{todoList,javaType=Object,jdbcType=STRUCT,jdbcTypeName=TODO_LIST_OBJ,mode=IN,typeHandler=spring_boot_tutorial.app.mybatis.TodoListTypeHandler})}
+  </select>
+
+  <resultMap id="todoListResultMap" type="TodoListModel">
+    <id property="todoId" column="TODO_ID"/>
+    <result property="userId" column="USER_ID"/>
+    <result property="title" column="TITLE"/>
+    <result property="createdAt" column="CREATED_AT"/>
+    <result property="updatedAt" column="UPDATED_AT"/>
+    <collection property="actions" ofType="ActionModel">
+      <id property="id" column="action_id"/>
+      <result property="todoId" column="TODO_ID"/>
+      <result property="content" column="CONTENT"/>
+    </collection>
+  </resultMap>
+</mapper>
