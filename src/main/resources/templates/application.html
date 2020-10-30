@@ -21,6 +21,11 @@
       </ul>
 
       <ul class="navbar-nav">
+        <li class="navbar-item text-light" sec:authorize="isAuthenticated()"
+         sec:authentication="principal.username"></li>
+      </ul>
+
+      <ul class="navbar-nav">
         <li class="navbar-item" sec:authorize="!isAuthenticated()">
           <a th:href="@{/signup}" class="nav-link">Sign up</a>
         </li>
@@ -52,7 +57,7 @@
   <script th:src="@{/js/bootstrap.bundle.js}"></script>
   <script>
     $("#add-todo-button").click(function() {
-      var baseInput = $("input[id^='todoList']").last();
+      var baseInput = $("input[id^='actions']").last();
       var baseId = baseInput.attr("id");
       var baseName = baseInput.attr("name");
       var index = parseInt(baseId.replace(/[^0-9]/g, ""));

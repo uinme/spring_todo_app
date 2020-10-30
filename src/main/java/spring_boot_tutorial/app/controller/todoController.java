@@ -18,7 +18,7 @@ import spring_boot_tutorial.app.model.UserDetail;
 import spring_boot_tutorial.app.service.TodoService;
 
 @Controller
-public class TodoController {
+public class todoController {
 
   @Autowired
   private TodoService todoService;

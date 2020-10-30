@@ -16,4 +16,6 @@ public class ActionModel {
   @Length(max = 500, message = "{length_todo_content}")
   private String content;
 
+  private String finished;
+
 }

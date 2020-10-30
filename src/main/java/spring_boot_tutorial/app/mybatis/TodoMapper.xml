@@ -30,6 +30,7 @@
       <id property="id" column="action_id"/>
       <result property="todoId" column="TODO_ID"/>
       <result property="content" column="CONTENT"/>
+      <result property="finished" column="FINISHED"/>
     </collection>
   </resultMap>
 </mapper>
